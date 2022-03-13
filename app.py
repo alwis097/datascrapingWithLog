@@ -1,4 +1,5 @@
 
+
 import email
 from unicodedata import name
 from flask import Flask, request, render_template,redirect,url_for
@@ -71,6 +72,9 @@ def create_account():
                 new_user = auth.create_user_with_email_and_password(email,password)
                 auth.send_email_verification(new_user['idToken'])
                 return render_template('create_verify_email.html')
+            else:
+                existing_acc1 = "Passwords don't match"
+                return render_template('create_account.html',existing_msg1=existing_acc1)
         except:
             existing_acc = "Already used email"
             return render_template('create_account.html',existing_msg=existing_acc)
@@ -80,9 +84,13 @@ def create_account():
 @app.route('/create_reset_password',methods = ['GET','POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['user_email']
-        auth.send_password_reset_email(email)
-        return render_template("create_index.html")
+        try:
+            email = request.form['user_email']
+            auth.send_password_reset_email(email)
+            return render_template("create_index.html")
+        except:
+            no_match = "Can't find an email"
+            return render_template("create_reset_password.html",no_match = no_match)
     return render_template("create_reset_password.html")
 
 
